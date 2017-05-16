@@ -3,55 +3,16 @@ var PROBABILITY = 0.6;
 
 class Maze {
   constructor(height = 50, width = 100) {
-    this.data = { cells: [] }
     this.height = parseInt(height, 10);
     this.width = parseInt(width, 10);
-    this.createData();
+
+    var mazeGen = new MazeGen(this.height, this.width);
+    this.data = {cells: mazeGen()};
+
     this.parseMazeData();
     this.moves = [0];
     this.commitMove(0);
     this.playBackIdx = 1;
-  }
-
-  createData() {
-    for (var i = 1; i < this.height * this.width + 1; i++) {
-      this.data.cells.push(this.createCellData(i));
-    }
-  }
-
-  createCellData(idx) {
-    return {
-      u: this.upData(idx),
-      r: this.rightData(idx),
-      d: this.downData(idx),
-      l: this.leftData(idx)
-    }
-  }
-
-  upData(idx) {
-    return (idx < this.width + 1) ? false : this.data["cells"][idx - this.width - 1].d;
-  }
-
-  rightData(idx) {
-    var isLast = idx === this.height * this.width;
-    if (isLast) {
-      return true;
-    }
-
-    return (idx % this.width === 0) ? false : Math.random() <= PROBABILITY;
-  }
-
-  downData(idx) {
-    return (idx > (this.height - 1) * this.width) ? false : Math.random() <= PROBABILITY;
-  }
-
-  leftData(idx) {
-    var isFirst = idx === 1;
-    if (isFirst) {
-      return true;
-    }
-
-    return (idx % this.width === 1) ? false : this.data["cells"][idx - 2].r;
   }
 
   setupStyling() {
@@ -59,7 +20,7 @@ class Maze {
     style.type = 'text/css';
 
     var cellWidth = 100 / this.width * 0.8;
-    var borderWidth = 100 / this.width * 0.1;
+    var borderWidth = 100 / this.width * 0.08;
 
     style.innerHTML = '.node { width: ' + cellWidth + 'vw; height: ' + cellWidth + 'vw; border: ' + borderWidth + 'vw solid #DDD; }';
     style.innerHTML += ' .top { border-top: ' + borderWidth + 'vw solid #CCC; }';
@@ -74,13 +35,20 @@ class Maze {
   parseMazeData() {
     this.setupStyling();
 
+    var row;
     var cells = this.data["cells"];
 
     for (var idx in cells) {
+      if(idx % this.width === 0) {
+	row = document.createElement("div");
+	row.className = "row";
+	this.addNode(row);
+      }
+
       var cellObj = cells[idx]
       var node = this.createNode(cellObj);
       node.id = idx;
-      this.addNode(node);
+      row.appendChild(node);
     }
   }
 
