@@ -107,6 +107,26 @@ var MazeGen = (function (walkableWidth, walkableHeight) {
 	return mazeData;
     }
 
+    // Add some random wall changes so that we have unreachable areas and loops and fun and stuff
+    function addNoise(data, amount) {
+	var offsets = [{x: -1, y: 0}, {x: 1, y: 0}, {x: 0, y: 1}, {x: 0, y: -1}];
+	
+	for(var i = 0; i < amount; i++) {
+	    var walkableLoc = {x: Math.floor(Math.random() * walkableWidth), y: Math.floor(Math.random() * walkableHeight)};
+	    var dataLoc = {x: walkableLoc.x * 2, y: walkableLoc.y * 2};
+
+	    var dir = offsets[Math.floor(Math.random() * offsets.length)];
+	    dataLoc.x += dir.x;
+	    dataLoc.y += dir.y;
+	    
+	    if(!outOfBoundsCheck(dataLoc)) {
+		data[dataLoc.x][dataLoc.y] = Math.random() < 0.5 ? WALL : FLOOR;
+	    }
+	}
+
+	return data;
+    }
+
     function directionCheck(data, loc, direction) {
 	var wallLoc = {x: loc.x + direction.x, y: loc.y + direction.y};
 	return !outOfBoundsCheck(wallLoc) && data[wallLoc.x][wallLoc.y] == FLOOR;
@@ -144,6 +164,10 @@ var MazeGen = (function (walkableWidth, walkableHeight) {
 	
 	var mazeData = primGenerator({x: 0, y: 0});
 
+	// Add 25% random noise, this will make some maps unsolvable. It will also add loops.
+	mazeData = addNoise(mazeData, Math.random() * 0.25);
+	
+	/*
 	mazeData.forEach(function (row) {
 	    var r = "";
 
@@ -153,6 +177,7 @@ var MazeGen = (function (walkableWidth, walkableHeight) {
 
 	    console.log(r);
 	});
+	*/
 
 	return convertToDirectionArray(mazeData);
     };
