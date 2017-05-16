@@ -165,7 +165,7 @@ var MazeGen = (function (walkableWidth, walkableHeight) {
 	var mazeData = primGenerator({x: 0, y: 0});
 
 	// Add 25% random noise, this will make some maps unsolvable. It will also add loops.
-	mazeData = addNoise(mazeData, Math.random() * 0.25);
+	mazeData = addNoise(mazeData, (Math.random() * 0.25) * walkableWidth * walkableHeight);
 	
 	/*
 	mazeData.forEach(function (row) {
